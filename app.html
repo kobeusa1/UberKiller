@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<title>UberKiller</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDj2y2xpGLOGFigmxYkXGkgL9BaNJz3sTw&signed_in=true"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
+.myLink {display: none}
+.cancelbtn {
+   width: auto;
+   padding: 10px 18px;
+   background-color: #f44336;
+}
+input[type=text], input[type=password] {
+   width: 100%;
+   padding: 12px 20px;
+   margin: 8px 0;
+   display: inline-block;
+   border: 1px solid #ccc;
+   box-sizing: border-box;
+}
+.imgClass { 
+background-image: url(https://s-media-cache-ak0.pinimg.com/originals/f1/17/82/f1178268a55783525abb2398f68aba61.gif);
+}
+</style>
+<p id="loginReminder" style="display:none" class="w3-red">Please Login First!</p>
+<body class="w3-light-grey">
+
+<!-- Navigation Bar -->
+<ul class="w3-navbar w3-white w3-border-bottom w3-xlarge">
+ <li><a href="#" class="w3-text-red w3-hover-red"><b><i class="fa fa-map-marker w3-margin-right"></i>UberKiller</b></a></li>
+ <li class="w3-right"><a href="#" class="w3-hover-red w3-text-grey"><i class="fa fa-search"></i></a></li>
+
+ <button style= "border-radius: 10px" id="logid" onclick="logio();" class="w3-hover-red">Login</button> 
+ <button style= "border-radius: 10px" id="Trips" class="w3-red" onclick="GetMyrecord()">My Trips</button>
+ <div id="id01" class="w3-modal">
+   <div class="w3-modal-content w3-card-4">
+     <header class="w3-container w3-teal">
+       <span onclick="document.getElementById('id01').style.display='none'" class="w3-closebtn">&times;</span>
+     </header>
+       <div class="w3-container">
+       <div class="container">
+       <p id="errorPass" style="display:none" class="w3-red">Invalid PassWord, Please Try again!<br /></p>
+     <label><b>Username</b></label>
+     <input type="text" id="username" placeholder="Enter Username" name="uname" required>
+
+     <label><b>Password</b></label>
+     <input type="password" id="password" placeholder="Enter Password" name="psw" required>
+     <button style= "border-radius: 10px" type="submit" class="w3-hover-red" onclick="FindUser();">Login</button>     
+     <button style= "border-radius: 10px" type="submit" class="w3-hover-red" onclick="RegisterUser()">Register</button>
+     <button style= "border-radius: 10px" type="button" class="w3-hover-red" onclick="document.getElementById('id01').style.display='none'">Cancel</button>
+   </div> 
+     </div>
+     <footer class="w3-container w3-teal">
+     </footer>
+   </div>
+ </div>
+   <div id="userRecord" class="w3-modal">
+   <div class="w3-modal-content w3-card-4">
+     <div class="imgClass">
+     <div class="w3-xlarge w3-padding-16">
+     <center><button style= "border-radius: 10px" id="confirmedTrips" class="w3-hover-red" onclick="confirmedTrips()">Search For Your Confirmd Trips</button></center>
+     </div>
+     <div class="w3-xlarge w3-padding-16">
+     <center><button style= "border-radius: 10px" id="waitingTrips" class="w3-hover-red" onclick="waitingTrips()">Making Confirmations</button></center>
+     </div>
+     <div class="w3-xlarge w3-padding-16">
+     <center><button style= "border-radius: 10px" id="Mypost" class="w3-hover-red" onclick="myPost()">Your Waiting List</button></center>
+     </div>
+     <div class="w3-xlarge w3-padding-16">
+       <center><button style= "border-radius: 10px" class="w3-hover-red" onclick="document.getElementById('userRecord').style.display='none'">Cancel</button></center>
+     </div>
+   </div>
+ </div>
+   </div>
+   <div id="passenger_info" class="w3-modal">
+   <div class="w3-modal-content w3-card-4">
+     <header class="w3-container w3-teal">
+       <span onclick="document.getElementById('passenger_info').style.display='none'" class="w3-closebtn">&times;</span>
+     </header>
+       <div class="w3-container">
+       <div class="container">
+     <label><b>How Many Person In your party</b></label>
+     <input type="text" id="pnumOfSeat" placeholder="Enter a Number" name="seat" required>
+     <label><b>Do you smoke</b></label>
+     <input type="text" id="psmoke" placeholder="Yes/No" name="smoke" required>
+     <label><b>Select a date</b></label>
+     <input type="text" id="datepicker">
+     <label><b>What time</b></label>
+     <input type="text" id="ptime" placeholder="Enter a Number" name="time" required>       
+     <label><b>How Much you are willing to Pay</b></label>
+     <input type="text" id="pcost" placeholder="Enter a Number" name="cost" required>    
+     <button type="submit" class="w3-hover-red" onclick="QueryUser();">Find</button> 
+     <button type="submit" class="w3-hover-red" onclick="PostUser();">Post</button> 
+     <button type="button" class="w3-hover-red" onclick="document.getElementById('passenger_info').style.display='none'">Cancel</button>
+   </div> 
+     </div>
+     <footer class="w3-container w3-teal">
+     </footer>
+   </div>
+ </div>
+     <div id="driver_info" class="w3-modal">
+   <div class="w3-modal-content w3-card-4">
+     <header class="w3-container w3-teal">
+       <span onclick="document.getElementById('driver_info').style.display='none'" class="w3-closebtn">&times;</span>
+     </header>
+       <div class="w3-container">
+       <div class="container">
+     <label><b>Seats Available</b></label>
+     <input type="text" id="dnumOfSeat" placeholder="Enter a Number" name="seat" required>
+     <label><b>Select a date</b></label>
+     <input type="text" id="datepicker1">
+     <label><b>What Time</b></label>
+     <input type="text" id="time">
+     <label><b>Do you smoke</b></label>
+     <input type="text" id="dsmoke" placeholder="Yes/No" name="smoke" required>
+     <label><b>How Much for each person</b></label>
+     <input type="text" id="dcost" placeholder="Enter a Number" name="cost" required> 
+     <button type="submit" class="w3-hover-red" onclick="QueryDriver();">Find</button> 
+     <button type="submit" class="w3-hover-red" onclick="PostDriver();">Post</button>     
+     <button type="button" class="w3-hover-red" onclick="document.getElementById('driver_info').style.display='none'">Cancel</button>
+   </div> 
+     </div>
+     <footer class="w3-container w3-teal">
+     </footer>
+   </div>
+ </div>
+</ul>
+
+<!-- Header -->
+<header class="w3-display-container w3-content w3-hide-small" style="max-width:1500px">
+ <img class="w3-image" src="http://s3.amazonaws.com/digitaltrends-uploads-prod/2015/12/man-driving-in-car-in-the-city-ride-share-uber-lyft-getaround-zipcar.jpg" alt="Driver" width="1500" height="700">
+ <div class="w3-display-middle" style="width:65%">
+   <ul class="w3-navbar w3-black">
+     <li><a href="javascript:void(0)" class="tablink" onclick="openLink(event, 'BookNow');"><i class="fa fa-rocket w3-margin-right"></i>Go Now</a></li>
+     <li><a href="javascript:void(0)" class="tablink" onclick="openLink(event, 'Date');"><i class="fa fa-book w3-margin-right"></i>I am Passenger</a></li>
+     <li><a href="javascript:void(0)" class="tablink" onclick="openLink(event, 'driver');"><i class="fa fa-car w3-margin-right"></i>I am Driver</a></li>
+
+   </ul>
+   <div id="BookNow" class="w3-container w3-white w3-padding-16 myLink">
+     <h3>Find the Nearest Car With Same Destination</h3>
+     <p><span class="w3-tag w3-deep-orange"></span></p>
+     <p>Just Enter your destination and Go</p>
+     <input id = "input" class="w3-input w3-border" type="text" placeholder="Where you going">
+     <p><button class="w3-btn w3-dark-grey" onclick="SearchEngin();">Lets Go Now</button></p>
+   </div>
+   <div id="Date" class="w3-container w3-white w3-padding-16 myLink">
+     <h3>Schedule a Date to Go</h3>
+     <p id="passnot" style="display:none" class="w3-red">Please Login First</p>
+     <div class="w3-row-padding" style="margin:0 -16px;">
+
+       <div class="w3-half">
+         <label>From</label>
+         <input id="pdeparture" class="w3-input w3-border" type="text" placeholder="Departing from" required>
+       </div>
+       <div class="w3-half">
+         <label>To</label>
+         <input id="pdestiantion" class="w3-input w3-border" type="text" placeholder="Arriving at" required>
+       </div>
+     </div>
+     <p><button class="w3-btn w3-dark-grey" onclick="Findpassenger();">Search Availability</button></p>
+   </div>
+   <div id="driver" class="w3-container w3-white w3-padding-16 myLink">
+     <h3>I am Driving To</h3>
+     <p id="drinot" style="display:none" class="w3-red">Please Login First</p>
+     <div class="w3-row-padding" style="margin:0 -16px;">
+
+       <div class="w3-half">
+         <label>From</label>
+         <input id= "departure" class="w3-input w3-border" type="text" placeholder="Departing from">
+       </div>
+       <div class="w3-half">
+         <label>To</label>
+         <input id="destination" class="w3-input w3-border" type="text" placeholder="Arriving at">
+       </div>
+     </div>
+     <p><button class="w3-btn w3-dark-grey" onclick="FindDriver();">Find Partner</button></p>
+   </div>
+
+ </div>
+</header>
+<footer class="w3-container w3-center w3-opacity w3-margin-bottom">
+ <h5>Find Us On</h5>
+ <div class="w3-xlarge w3-padding-16">
+   <i class="fa fa-facebook-official w3-hover-text-indigo"></i>
+   <i class="fa fa-instagram w3-hover-text-purple"></i>
+   <i class="fa fa-snapchat w3-hover-text-yellow"></i>
+   <i class="fa fa-pinterest-p w3-hover-text-red"></i>
+   <i class="fa fa-twitter w3-hover-text-light-blue"></i>
+   <i class="fa fa-linkedin w3-hover-text-indigo"></i>
+ </div>
+ <!-- <p>Powered by <a href="http://www.w3schools.com/w3css/default.asp" target="_blank" class="w3-hover-text-green">w3.css</a></p> -->
+</footer>
+
+<script>
+var socket = io.connect();
+ socket.on('First message', function(data){
+   console.log(data.message);
+}); 
+var modal = document.getElementById('id01');
+var userName = "";
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+   if (event.target == modal) {
+       modal.style.display = "none";
+   }
+}
+function GetMyrecord() {
+ //   document.getElementById('loginReminder').style.display='inline';
+ // } else {
+ //   window.location = '/Customer/' + userName;
+ // }
+ document.getElementById('userRecord').style.display='inline';
+}
+function confirmedTrips() {
+ window.location = '/confirmedTrips/' + userName;
+}
+function waitingTrips() {
+ window.location = '/waitingTrips/' + userName;
+}
+function myPost() {
+ window.location = '/myPost/' + userName;
+}
+
+function SearchEngin(intput) {
+ console.log(key);
+ if(!checkLogin()) {
+   document.getElementById('passnot').style.display='inline';
+ } else {
+   var key = document.getElementById('input').value;
+   socket.emit('SearchNow', key);
+   window.location = '/GoNow/' + userName + '/' + key;
+ }
+
+ console.log(key);
+}
+function logio() {
+ console.log(document.getElementById("logid").innerHTML);
+ if (document.getElementById("logid").innerHTML == "Login") {
+   document.getElementById('id01').style.display='block'
+ } else {
+   window.location='/';
+   document.getElementById("logid").innerHTML = "Login"
+   userName="";
+
+ }
+}
+
+function FindUser(){
+ var username = document.getElementById('username').value;
+ var password = document.getElementById('password').value;
+
+ socket.emit('finduser', username, password);
+ socket.on('getRespons',function(isfound, data){
+     if (isfound == 'true') {
+       console.log(isfound);
+       document.getElementById("logid").innerHTML="LogOut";
+       document.getElementById('id01').style.display='none';
+       userName = data.Item.UserName;
+       document.getElementById('passnot').style.display='none';
+       document.getElementById('drinot').style.display='none';
+       console.log(data);
+     } else {
+         document.getElementById('errorPass').style.display='inline';
+
+     }
+ });
+}
+function PostUser() {
+ var str = document.getElementById('datepicker').value;
+ var index = str.lastIndexOf("/");
+ var year = str.substring(index+1);
+ var date = str.substring(0,index);
+ var res = year + "/" + date;
+ var query = {
+   "Destination" :document.getElementById('pdestiantion').value,
+   "Departure" : document.getElementById('pdeparture').value,
+   "date" :  res,
+   "Seats" : document.getElementById('pnumOfSeat').value,
+   "smoke" : document.getElementById('psmoke').value,
+   "cost" : document.getElementById('pcost').value,
+   "PassengerId" : userName,
+   "Time" : document.getElementById('ptime').value
+ }
+ socket.emit('postuser',query);
+ document.getElementById("passenger_info").style.display = "none";
+ alert("Your request have posted, You can make Confirmations if there is a match");
+}
+
+function Search(position) {
+ console.log(position.coords.latitude);
+ console.log(position.coords.longitude);
+ socket.emit('serachRegion', position.coords.latitude, position.coords.longitude);
+ socket.on('test', function(data) {
+   console.log(data);
+
+ });
+ var params = function(args){       
+           var p = [];
+
+           for(var n in args)
+               p.push( n + '=' + args[n]);
+
+           return encodeURI('?' + p.join('&'));
+       };
+
+       window.onload = function(){
+
+           document.getElementById('send').onclick = function(){
+
+               var data = {    
+                   name:'latitude',
+                   value:'position.coords.latitude'
+               };
+
+               location.href = '/retrieve' + params(data);
+           };
+       };
+}
+
+function RegisterUser() {
+   window.location = '/register';
+   console.log("User Corrected Successfully");
+
+}
+function errorMessage(error) {
+   switch(error.code) {
+       case error.PERMISSION_DENIED:
+           console.log("User denied the request for Geolocation."); 
+           break;
+       case error.POSITION_UNAVAILABLE:
+           console.log("Location information is unavailable.");
+           break;
+       case error.TIMEOUT:
+           console.log("The request to get user location timed out.");
+           break;
+       case error.UNKNOWN_ERROR:
+           console.log("An unknown error occurred.");
+           break;
+   }
+}
+// Tabs
+function openLink(evt, linkName) {
+ var i, x, tablinks;
+ x = document.getElementsByClassName("myLink");
+ for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+ }
+ tablinks = document.getElementsByClassName("tablink");
+ for (i = 0; i < x.length; i++) {
+     tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
+ }
+ document.getElementById(linkName).style.display = "block";
+ evt.currentTarget.className += " w3-red";
+}
+function checkLogin() {
+ return userName != "";
+}
+function Findpassenger() {
+ if(!checkLogin()) {
+   document.getElementById('passnot').style.display='inline';
+
+ } else {
+   //document.getElementById('driverInfo').style.display='none';
+   document.getElementById('passenger_info').style.display='block';
+
+ }
+
+}
+function FindDriver() {
+ if(!checkLogin()) {
+   document.getElementById('drinot').style.display='inline';
+
+
+ } else {
+   document.getElementById('driver_info').style.display='block';
+
+ }
+
+}
+$(function() {
+   $( "#datepicker").datepicker();
+});
+$(function() {
+ $( "#datepicker1").datepicker();
+});
+function QueryUser() {
+ //var date = getCode(document.getElementById('pdate').value);
+
+ console.log(document.getElementById('datepicker').value);
+ var str = document.getElementById('datepicker').value;
+ var index = str.lastIndexOf("/");
+ var year = str.substring(index+1);
+ var date = str.substring(0,index);
+ var res = year + "/" + date;
+ console.log(res);
+ window.location = '/AvailableDriver/' + "Destination=" + document.getElementById('pdestiantion').value + "?Departure=" + document.getElementById('pdeparture').value + "?date=" + res + "?smoke=" + document.getElementById('psmoke').value + "?Cost=" + document.getElementById('pcost').value + "?Seats=" + document.getElementById('pnumOfSeat').value + "?username=" + userName + "?";
+}
+function QueryDriver() {
+ var str = document.getElementById('datepicker1').value;
+ var index = str.lastIndexOf("/");
+ var year = str.substring(index+1);
+ var date = str.substring(0,index);
+ var res = year + "/" + date;
+ console.log(res);
+ window.location = '/AvailablePassenger/' + "Destination=" + document.getElementById('destination').value + "?Departure=" + document.getElementById('departure').value + "?date=" + res + "?smoke=" + document.getElementById('dsmoke').value + "?Cost=" + document.getElementById('dcost').value + "?Seats=" + document.getElementById('dnumOfSeat').value + "?username=" + userName + "?";
+}
+function PostDriver() {
+ console.log(document.getElementById('datepicker1').value);
+ var str = document.getElementById('datepicker1').value;
+ var index = str.lastIndexOf("/");
+ var year = str.substring(index+1);
+ var date = str.substring(0,index);
+ var res = year + "/" + date;
+ console.log(res);
+ var query = {
+   "Destination" :document.getElementById('destination').value,
+   "Departure" : document.getElementById('departure').value,
+   "date" : res,
+   "Seats" : document.getElementById('dnumOfSeat').value,
+   "smoke" : document.getElementById('dsmoke').value,
+   "time" : document.getElementById('time').value,
+   "email" : userName,
+   "cost" : document.getElementById('dcost').value,
+ }
+ console.log(query);
+ socket.emit('postdriver',query);
+ alert("Your request have posted, You can make Confirmations if there is a match");
+
+}
+// Click on the first tablink on load
+document.getElementsByClassName("tablink")[0].click();
+
+</script>
+
+</body>
+</html>
